@@ -1,0 +1,1 @@
+ALTER TABLE users ADD COLUMN registered_at timestamptz default now();
