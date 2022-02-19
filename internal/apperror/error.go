@@ -20,4 +20,10 @@ var (
 
 	// ErrValidationFailed is used when input validation failed.
 	ErrValidationFailed = errors.New("input validation failed. please, provide valid values")
+
+	// ErrEmailTaken is used when the user is being created and given email is already taken.
+	ErrEmailTaken = errors.New("email already taken")
+
+	// ErrWrongPassword is used when user entered wrong password.
+	ErrWrongPassword = errors.New("wrong email or password")
 )
