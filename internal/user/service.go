@@ -33,6 +33,8 @@ func NewService(storage Storage, logger logger.Logger) Service {
 	}
 }
 
+// CreateUser inserts a new user record in storage. Returns inserted user on success
+// or an error on failure.
 func (s *service) Create(ctx context.Context, input *CreateUserDTO) (*User, error) {
 	found, err := s.storage.FindByEmail(input.Email)
 	if err != nil {
@@ -64,6 +66,8 @@ func (s *service) Create(ctx context.Context, input *CreateUserDTO) (*User, erro
 	return user, nil
 }
 
+// GetByEmailAndPassword finds a user record in storage by email and validates specified password.
+// Returns ErrWrongPassword if passwords don't match. Returns an error on failure.
 func (s *service) GetByEmailAndPassword(ctx context.Context, email, password string) (*User, error) {
 	user, err := s.storage.FindByEmail(email)
 	if err != nil {
@@ -81,6 +85,9 @@ func (s *service) GetByEmailAndPassword(ctx context.Context, email, password str
 	return user, nil
 }
 
+// GetById finds a user record in storage by specified id.
+// Returns ErrNoRows user with this id doesn't exist.
+// Returns an error on failure.
 func (s *service) GetById(ctx context.Context, id int64) (*User, error) {
 	user, err := s.storage.FindById(id)
 	if err != nil {
@@ -94,6 +101,9 @@ func (s *service) GetById(ctx context.Context, id int64) (*User, error) {
 	return user, nil
 }
 
+// GetByUsername finds a user record in storage by specified username.
+// Returns ErrNoRows user with this username doesn't exist.
+// Returns an error on failure.
 func (s *service) GetByUsername(ctx context.Context, username string) (*User, error) {
 	user, err := s.storage.FindByUsername(username)
 	if err != nil {
@@ -107,6 +117,9 @@ func (s *service) GetByUsername(ctx context.Context, username string) (*User, er
 	return user, nil
 }
 
+// Update updates a user record in storage by specified id.
+// Returns ErrNoRows user with this id doesn't exist,
+// ErrWrongPassword if passwords don't match or an error on failure.
 func (s *service) Update(ctx context.Context, user *UpdateUserDTO) error {
 	u, err := s.GetById(ctx, user.Id)
 	if err != nil {
@@ -129,6 +142,9 @@ func (s *service) Update(ctx context.Context, user *UpdateUserDTO) error {
 	return nil
 }
 
+// Update partially updates a user record in storage by specified id.
+// Returns ErrNoRows user with this id doesn't exist,
+// ErrWrongPassword if passwords don't match or an error on failure.
 func (s *service) UpdatePartially(ctx context.Context, user *UpdateUserPartiallyDTO) error {
 	u, err := s.GetById(ctx, user.Id)
 	if err != nil {
@@ -160,6 +176,8 @@ func (s *service) UpdatePartially(ctx context.Context, user *UpdateUserPartially
 	return nil
 }
 
+// Delete deletes a user record in storage by specified id.
+// Returns ErrNoRows user with this id doesn't exist, or an error on failure.
 func (s *service) Delete(ctx context.Context, id int64) error {
 	err := s.storage.Delete(id)
 	if err != nil {

@@ -19,15 +19,15 @@ const (
 // Check whether db implements user storage interface.
 var _ Storage = &db{}
 
-// db implementes user storage interface.
+// db implements user storage interface.
 type db struct {
 	logger         logger.Logger
 	conn           *pgx.Conn
 	requestTimeout time.Duration
 }
 
-// NewUserStorage returns a new user storage instance.
-func NewUserStorage(storage *pgx.Conn, requestTimeout int) Storage {
+// NewStorage returns a new user storage instance.
+func NewStorage(storage *pgx.Conn, requestTimeout int) Storage {
 	return &db{
 		logger:         logger.GetLogger(),
 		conn:           storage,
@@ -35,7 +35,7 @@ func NewUserStorage(storage *pgx.Conn, requestTimeout int) Storage {
 	}
 }
 
-// Create inserts a user record in the database.
+// Create inserts a user record in database.
 // Returns an error on failure or inserted user with it's id on success.
 func (d *db) Create(user *User) (*User, error) {
 	query := fmt.Sprintf(`
@@ -62,6 +62,9 @@ func (d *db) Create(user *User) (*User, error) {
 	return user, nil
 }
 
+// FindByEmail find the user with specified email.
+// If user is found, returns a user instance or ErrNoRows.
+// Returns an error on failure.
 func (d *db) FindByEmail(email string) (*User, error) {
 	query := fmt.Sprintf(`
 	SELECT id, username, email, password, verified, address, phone_number, TO_CHAR(registered_at, 'DD-MM-YYYY')
@@ -96,6 +99,9 @@ func (d *db) FindByEmail(email string) (*User, error) {
 	return &found, nil
 }
 
+// FindByUsername find the user with specified username.
+// If user is found, returns a user instance or ErrNoRows.
+// Returns an error on failure.
 func (d *db) FindByUsername(username string) (*User, error) {
 	query := fmt.Sprintf(`
 	SELECT id, username, email, password, verified, address, phone_number, TO_CHAR(registered_at, 'DD-MM-YYYY')
@@ -129,6 +135,9 @@ func (d *db) FindByUsername(username string) (*User, error) {
 	return &found, nil
 }
 
+// FindById find the user with specified id.
+// If user is found, returns a user instance or ErrNoRows.
+// Returns an error on failure.
 func (d *db) FindById(id int64) (*User, error) {
 	query := fmt.Sprintf(`
 	SELECT id, username, email, password, verified, address, phone_number, TO_CHAR(registered_at, 'DD-MM-YYYY')
@@ -162,6 +171,8 @@ func (d *db) FindById(id int64) (*User, error) {
 	return &found, nil
 }
 
+// Update updates the user with specified values.
+// If user with this id doesn't exist, returns ErrNoRows or an error on failure.
 func (d *db) Update(user *UpdateUserDTO) error {
 	query := fmt.Sprintf(`
 	UPDATE %s
@@ -197,6 +208,8 @@ func (d *db) Update(user *UpdateUserDTO) error {
 	return nil
 }
 
+// UpdatePartially partially updates the user with specified values.
+// If user with this id doesn't exist, returns ErrNoRows or an error on failure.
 func (d *db) UpdatePartially(user *UpdateUserPartiallyDTO) error {
 	values := make([]string, 0)
 	args := make([]interface{}, 0)
@@ -239,23 +252,33 @@ func (d *db) UpdatePartially(user *UpdateUserPartiallyDTO) error {
 	ctx, cancel := context.WithTimeout(context.Background(), d.requestTimeout)
 	defer cancel()
 
-	_, err := d.conn.Exec(ctx, query, args...)
+	result, err := d.conn.Exec(ctx, query, args...)
 	if err != nil {
 		return fmt.Errorf("failed to update user partially: %v", err)
+	}
+
+	if result.RowsAffected() == 0 {
+		return apperror.ErrNoRows
 	}
 
 	return nil
 }
 
+// Delete deletes the user with specified it.
+// If user with this id doesn't exist, returns ErrNoRows or an error on failure.
 func (d *db) Delete(id int64) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", tableName)
 
 	ctx, cancel := context.WithTimeout(context.Background(), d.requestTimeout)
 	defer cancel()
 
-	_, err := d.conn.Exec(ctx, query, id)
+	result, err := d.conn.Exec(ctx, query, id)
 	if err != nil {
 		return fmt.Errorf("failed to delete user: %v", err)
+	}
+
+	if result.RowsAffected() == 0 {
+		return apperror.ErrNoRows
 	}
 
 	return nil
