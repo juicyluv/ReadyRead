@@ -13,6 +13,8 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/juicyluv/ReadyRead/config"
 	"github.com/juicyluv/ReadyRead/internal/server"
+	"github.com/juicyluv/ReadyRead/internal/user"
+	"github.com/juicyluv/ReadyRead/internal/user/db"
 	"github.com/juicyluv/ReadyRead/pkg/logger"
 	"github.com/julienschmidt/httprouter"
 )
@@ -55,16 +57,12 @@ func main() {
 
 	logger.Info("connected to database")
 
-	// userStorage := db.NewStorage(mongoClient, cfg.DB.Collection)
-	// userService := user.NewService(userStorage, logger)
+	userStorage := db.NewUserStorage(dbConn, cfg.DB.RequestTimeout)
+	userService := user.NewService(userStorage, logger)
 
-	// userHandler := user.NewHandler(logger, userService)
-	// userHandler.Register(router)
-	// logger.Info("initialized user routes")
-
-	// logger.Info("initializing swagger documentation")
-	// internal.InitSwagger(router)
-	// logger.Info("initialized swagger documentation")
+	userHandler := user.NewHandler(logger, userService)
+	userHandler.Register(router)
+	logger.Info("initialized user routes")
 
 	logger.Info("starting the server")
 	srv := server.NewServer(cfg, router, &logger)
