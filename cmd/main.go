@@ -12,9 +12,7 @@ import (
 
 	"github.com/jackc/pgx/v4"
 	"github.com/juicyluv/ReadyRead/config"
-	"github.com/juicyluv/ReadyRead/internal/author"
 	"github.com/juicyluv/ReadyRead/internal/server"
-	"github.com/juicyluv/ReadyRead/internal/user"
 	"github.com/juicyluv/ReadyRead/pkg/logger"
 	"github.com/julienschmidt/httprouter"
 )
@@ -22,6 +20,13 @@ import (
 var (
 	configPath = flag.String("config-path", "config/config.yml", "path for application configuration file")
 )
+
+// @title ReadyRead API
+// @version 1.0.0
+// @description API documentation for ReadyRead book shop.
+
+// @host localhost:8080
+// @BasePath /api
 
 func main() {
 	flag.Parse()
@@ -57,18 +62,6 @@ func main() {
 
 	logger.Info("connected to database")
 
-	userStorage := user.NewUserStorage(dbConn, cfg.DB.RequestTimeout)
-	userService := user.NewService(userStorage, logger)
-	userHandler := user.NewHandler(logger, userService)
-	userHandler.Register(router)
-	logger.Info("initialized user routes")
-
-	authorStorage := author.NewAuthorStorage(dbConn, cfg.DB.RequestTimeout)
-	authorService := author.NewService(authorStorage, logger)
-	authorHandler := author.NewHandler(logger, authorService)
-	authorHandler.Register(router)
-	logger.Info("initialized author routes")
-
 	logger.Info("starting the server")
 	srv := server.NewServer(cfg, router, &logger)
 
@@ -77,7 +70,7 @@ func main() {
 	signal.Notify(quit, signals...)
 
 	go func() {
-		if err := srv.Run(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		if err := srv.Run(dbConn); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			logger.Fatalf("cannot run the server: %v", err)
 		}
 	}()
@@ -88,8 +81,16 @@ func main() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer func() {
-		// TODO: Close database connection.
-		logger.Info("closed mongo database connection")
+		dbCloseCtx, dbCloseCancel := context.WithTimeout(
+			context.Background(),
+			time.Duration(cfg.DB.ShutdownTimeout)*time.Second,
+		)
+		defer dbCloseCancel()
+		err := dbConn.Close(dbCloseCtx)
+		if err != nil {
+			logger.Error("failed to close database connection: %v", err)
+		}
+		logger.Info("closed database connection")
 		cancel()
 	}()
 
