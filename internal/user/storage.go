@@ -6,7 +6,7 @@ type Storage interface {
 	FindByEmail(email string) (*User, error)
 	FindById(id int64) (*User, error)
 	FindByUsername(username string) (*User, error)
-	Update(user *User) error
+	Update(user *UpdateUserDTO) error
 	UpdatePartially(user *UpdateUserPartiallyDTO) error
 	Delete(id int64) error
 }
