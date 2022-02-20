@@ -1,6 +1,8 @@
 package user
 
 import (
+	"fmt"
+
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
 	"golang.org/x/crypto/bcrypt"
@@ -89,13 +91,12 @@ func (u *CreateUserDTO) Validate() error {
 
 // UpdateUserDTO is used to update user record.
 type UpdateUserDTO struct {
+	Id          int64   `json:"-"`
 	Email       string  `json:"email"`
 	Username    string  `json:"username"`
-	Password    string  `json:"password"`
 	Address     *string `json:"address"`
 	PhoneNumber *string `json:"phoneNumber"`
-	OldPassword string  `json:"oldPassword"`
-	NewPassword string  `json:"newPassword"`
+	Password    string  `json:"oldPassword"`
 } // @name UpdateUserInput
 
 // Validate will validates current struct fields.
@@ -103,12 +104,11 @@ type UpdateUserDTO struct {
 func (u *UpdateUserDTO) Validate() error {
 	return validation.ValidateStruct(
 		u,
-		validation.Field(&u.Email, is.Email),
-		validation.Field(&u.Username, validation.Length(3, 20), is.Alphanumeric),
-		validation.Field(&u.Address, is.ASCII, validation.Length(3, 100)),
-		validation.Field(&u.PhoneNumber, is.Alphanumeric, validation.Length(5, 12)),
-		validation.Field(&u.OldPassword, is.Alphanumeric, validation.Required),
-		validation.Field(&u.NewPassword, validation.Length(6, 24), is.Alphanumeric),
+		validation.Field(&u.Email, is.Email, validation.Required),
+		validation.Field(&u.Username, validation.Length(3, 20), is.Alphanumeric, validation.Required),
+		validation.Field(&u.Address, is.ASCII, validation.Length(3, 100), validation.Required),
+		validation.Field(&u.PhoneNumber, is.Alphanumeric, validation.Length(5, 12), validation.Required),
+		validation.Field(&u.Password, is.Alphanumeric, validation.Required),
 	)
 }
 
@@ -135,4 +135,20 @@ func (u *UpdateUserPartiallyDTO) Validate() error {
 		validation.Field(&u.Address, is.ASCII, validation.Length(3, 100)),
 		validation.Field(&u.PhoneNumber, is.Alphanumeric, validation.Length(5, 12)),
 	)
+}
+
+// HashPassword will encrypt current user password.
+// Returns an error on failure.
+func (u *UpdateUserPartiallyDTO) HashPassword() error {
+	if u.NewPassword == nil {
+		return fmt.Errorf("newPassword cannot be nil")
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword(
+		[]byte(*u.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	*u.NewPassword = string(hashedPassword)
+	return nil
 }
