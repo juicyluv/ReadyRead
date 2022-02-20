@@ -1,12 +1,12 @@
 package user
 
-import "context"
-
 // Storage descibes a user storage functionality.
 type Storage interface {
-	Create(ctx context.Context, user *User) (*User, error)
-	FindByEmail(ctx context.Context, email string) (*User, error)
-	FindById(ctx context.Context, id int64) (*User, error)
-	UpdatePartially(ctx context.Context, user *User) error
-	Delete(ctx context.Context, id int64) error
+	Create(user *User) (*User, error)
+	FindByEmail(email string) (*User, error)
+	FindById(id int64) (*User, error)
+	FindByUsername(username string) (*User, error)
+	Update(user *User) error
+	UpdatePartially(user *UpdateUserPartiallyDTO) error
+	Delete(id int64) error
 }
