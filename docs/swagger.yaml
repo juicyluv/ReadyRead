@@ -1,5 +1,38 @@
 basePath: /api
 definitions:
+  Author:
+    properties:
+      id:
+        example: 123
+        type: integer
+      name:
+        example: Ilya
+        type: string
+      surname:
+        example: Sokolov
+        type: string
+    type: object
+  CreateAuthorInput:
+    properties:
+      name:
+        example: Ilya
+        type: string
+      surname:
+        example: Sokolov
+        type: string
+    type: object
+  CreateGenreInput:
+    properties:
+      genre:
+        example: fantasy
+        type: string
+    type: object
+  CreateLanguageInput:
+    properties:
+      language:
+        example: ru
+        type: string
+    type: object
   CreateUserInput:
     properties:
       address:
@@ -21,11 +54,6 @@ definitions:
         example: admin
         type: string
     type: object
-  CreateUserResponse:
-    properties:
-      id:
-        type: string
-    type: object
   ErrorResponse:
     properties:
       code:
@@ -33,6 +61,54 @@ definitions:
       developerMessage:
         type: string
       message:
+        type: string
+    type: object
+  Genre:
+    properties:
+      genre:
+        example: fantasy
+        type: string
+      id:
+        example: 123
+        type: integer
+    type: object
+  Language:
+    properties:
+      id:
+        example: 123
+        type: integer
+      language:
+        example: ru
+        type: string
+    type: object
+  UpdateAuthorInput:
+    properties:
+      name:
+        example: Ilya
+        type: string
+      surname:
+        example: Sokolov
+        type: string
+    type: object
+  UpdateAuthorPartiallyInput:
+    properties:
+      name:
+        example: Ilya
+        type: string
+      surname:
+        example: Sokolov
+        type: string
+    type: object
+  UpdateGenreInput:
+    properties:
+      genre:
+        example: fantasy
+        type: string
+    type: object
+  UpdateLanguageInput:
+    properties:
+      language:
+        example: en
         type: string
     type: object
   UpdateUserInput:
@@ -103,6 +179,405 @@ info:
   title: ReadyRead API
   version: 1.0.0
 paths:
+  /authors:
+    post:
+      consumes:
+      - application/json
+      description: Register a new author.
+      parameters:
+      - description: JSON input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/CreateAuthorInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/Author'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Create author
+      tags:
+      - authors
+  /authors/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete author with specified id.
+      parameters:
+      - description: Author id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Delete author
+      tags:
+      - authors
+    get:
+      consumes:
+      - application/json
+      description: Get author by id.
+      parameters:
+      - description: Author id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Author'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Show author information
+      tags:
+      - authors
+    patch:
+      consumes:
+      - application/json
+      description: Partially update author with specified id.
+      parameters:
+      - description: Author id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: JSON input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateAuthorPartiallyInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Update author
+      tags:
+      - authors
+    put:
+      consumes:
+      - application/json
+      description: Update author with specified id.
+      parameters:
+      - description: Author id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: JSON input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateAuthorInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Update user
+      tags:
+      - authors
+  /genres:
+    post:
+      consumes:
+      - application/json
+      description: Insert genre in database.
+      parameters:
+      - description: JSON input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/CreateGenreInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/Genre'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Create genre
+      tags:
+      - genres
+  /genres/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete genre with specified id.
+      parameters:
+      - description: Genre id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Delete genre
+      tags:
+      - genres
+    get:
+      consumes:
+      - application/json
+      description: Get genre by id.
+      parameters:
+      - description: Genre id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Genre'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Show genre information
+      tags:
+      - genres
+    put:
+      consumes:
+      - application/json
+      description: Update genre with specified id.
+      parameters:
+      - description: Genre id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: JSON input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateGenreInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Update genre
+      tags:
+      - genres
+  /languages:
+    post:
+      consumes:
+      - application/json
+      description: Insert language in database.
+      parameters:
+      - description: JSON input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/CreateLanguageInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/Language'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Create language
+      tags:
+      - languages
+  /languages/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete language with specified id.
+      parameters:
+      - description: Language id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Delete genre
+      tags:
+      - languages
+    get:
+      consumes:
+      - application/json
+      description: Get language by id.
+      parameters:
+      - description: Language id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Language'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Show language information
+      tags:
+      - languages
+    put:
+      consumes:
+      - application/json
+      description: Update language with specified id.
+      parameters:
+      - description: Language id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: JSON input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateLanguageInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Update language
+      tags:
+      - languages
   /users:
     get:
       consumes:
@@ -158,7 +633,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/CreateUserResponse'
+            $ref: '#/definitions/User'
         "400":
           description: Bad Request
           schema:
