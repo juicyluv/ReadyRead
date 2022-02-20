@@ -1,6 +1,6 @@
 package user
 
-// Storage descibes a user storage functionality.
+// Storage descibes user storage functionality.
 type Storage interface {
 	Create(user *User) (*User, error)
 	FindByEmail(email string) (*User, error)
