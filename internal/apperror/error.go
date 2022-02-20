@@ -11,7 +11,7 @@ var (
 	ErrNotFound = NewAppError(
 		http.StatusNotFound,
 		"requested resource is not found",
-		"maybe you have an error in your request or requested resource not found",
+		"maybe you have an error in your request or requested resource does not exist",
 	)
 
 	// ErrNoRows is used when no rows returned from storage.
@@ -26,7 +26,7 @@ var (
 	// ErrWrongPassword is used when client provided wrong password.
 	ErrWrongPassword = errors.New("wrong email or password")
 
-	// ErrInvalidRequestBody is used when client
+	// ErrInvalidRequestBody is used when client sends invalid request body.
 	ErrInvalidRequestBody = errors.New("invalid request body")
 )
 
