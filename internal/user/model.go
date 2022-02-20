@@ -8,12 +8,14 @@ import (
 
 // User represents the user model.
 type User struct {
-	Id           int64  `json:"id" example:"123"`
-	Email        string `json:"email" example:"admin@example.com"`
-	Username     string `json:"username" example:"admin"`
-	Password     string `json:"-"`
-	Verified     bool   `json:"verified" example:"true"`
-	RegisteredAt string `json:"registeredAt" example:"2022/02/24"`
+	Id           int64   `json:"id" example:"123"`
+	Email        string  `json:"email" example:"admin@example.com"`
+	Username     string  `json:"username" example:"admin"`
+	Password     string  `json:"-"`
+	Verified     bool    `json:"verified" example:"true"`
+	Address      *string `json:"address,omitempty"`
+	PhoneNumber  *string `json:"phoneNumber,omitempty"`
+	RegisteredAt string  `json:"registeredAt" example:"2022/02/24"`
 } // @name User
 
 // HashPassword will encrypt current user password.
@@ -87,11 +89,13 @@ func (u *CreateUserDTO) Validate() error {
 
 // UpdateUserDTO is used to update user record.
 type UpdateUserDTO struct {
-	Id          int64   `json:"-"`
-	Email       *string `json:"email"`
-	Username    *string `json:"username"`
-	OldPassword *string `json:"oldPassword"`
-	NewPassword *string `json:"newPassword"`
+	Email       string  `json:"email"`
+	Username    string  `json:"username"`
+	Password    string  `json:"password"`
+	Address     *string `json:"address"`
+	PhoneNumber *string `json:"phoneNumber"`
+	OldPassword string  `json:"oldPassword"`
+	NewPassword string  `json:"newPassword"`
 } // @name UpdateUserInput
 
 // Validate will validates current struct fields.
@@ -101,7 +105,34 @@ func (u *UpdateUserDTO) Validate() error {
 		u,
 		validation.Field(&u.Email, is.Email),
 		validation.Field(&u.Username, validation.Length(3, 20), is.Alphanumeric),
+		validation.Field(&u.Address, is.ASCII, validation.Length(3, 100)),
+		validation.Field(&u.PhoneNumber, is.Alphanumeric, validation.Length(5, 12)),
 		validation.Field(&u.OldPassword, is.Alphanumeric, validation.Required),
 		validation.Field(&u.NewPassword, validation.Length(6, 24), is.Alphanumeric),
+	)
+}
+
+// UpdateUserPartiallyDTO is used to update user record.
+type UpdateUserPartiallyDTO struct {
+	Id          int64   `json:"-"`
+	Email       *string `json:"email"`
+	Username    *string `json:"username"`
+	OldPassword *string `json:"oldPassword"`
+	NewPassword *string `json:"newPassword"`
+	Address     *string `json:"address"`
+	PhoneNumber *string `json:"phoneNumber"`
+} // @name UpdateUserPartiallyInput
+
+// Validate will validates current struct fields.
+// Returns an error if something doesn't fit rules.
+func (u *UpdateUserPartiallyDTO) Validate() error {
+	return validation.ValidateStruct(
+		u,
+		validation.Field(&u.Email, is.Email),
+		validation.Field(&u.Username, validation.Length(3, 20), is.Alphanumeric),
+		validation.Field(&u.OldPassword, is.Alphanumeric, validation.Required),
+		validation.Field(&u.NewPassword, validation.Length(6, 24), is.Alphanumeric),
+		validation.Field(&u.Address, is.ASCII, validation.Length(3, 100)),
+		validation.Field(&u.PhoneNumber, is.Alphanumeric, validation.Length(5, 12)),
 	)
 }
