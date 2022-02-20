@@ -72,7 +72,7 @@ func (s *service) Update(ctx context.Context, author *UpdateAuthorDTO) error {
 
 	err = s.storage.Update(author)
 	if err != nil {
-		s.logger.Errorf("failed to update user: %v", err)
+		s.logger.Errorf("failed to update author: %v", err)
 		return err
 	}
 
@@ -83,7 +83,7 @@ func (s *service) UpdatePartially(ctx context.Context, author *UpdateAuthorParti
 	a, err := s.GetById(ctx, author.Id)
 	if err != nil {
 		if !errors.Is(err, apperror.ErrNoRows) {
-			s.logger.Errorf("failed to get user: %v", err)
+			s.logger.Errorf("failed to get author: %v", err)
 		}
 		return err
 	}

@@ -19,15 +19,15 @@ const (
 // Check whether db implements author storage interface.
 var _ Storage = &db{}
 
-// db implementes user storage interface.
+// db implements author storage interface.
 type db struct {
 	logger         logger.Logger
 	conn           *pgx.Conn
 	requestTimeout time.Duration
 }
 
-// NewAuthorStorage returns a new author storage instance.
-func NewAuthorStorage(storage *pgx.Conn, requestTimeout int) Storage {
+// NewStorage returns a new author storage instance.
+func NewStorage(storage *pgx.Conn, requestTimeout int) Storage {
 	return &db{
 		logger:         logger.GetLogger(),
 		conn:           storage,

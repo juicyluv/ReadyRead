@@ -1,6 +1,6 @@
 package author
 
-// Storage descibes a user storage functionality.
+// Storage descibes author storage functionality.
 type Storage interface {
 	Create(user *Author) (*Author, error)
 	FindById(id int64) (*Author, error)
