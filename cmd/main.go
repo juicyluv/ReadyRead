@@ -12,9 +12,9 @@ import (
 
 	"github.com/jackc/pgx/v4"
 	"github.com/juicyluv/ReadyRead/config"
+	"github.com/juicyluv/ReadyRead/internal/author"
 	"github.com/juicyluv/ReadyRead/internal/server"
 	"github.com/juicyluv/ReadyRead/internal/user"
-	"github.com/juicyluv/ReadyRead/internal/user/db"
 	"github.com/juicyluv/ReadyRead/pkg/logger"
 	"github.com/julienschmidt/httprouter"
 )
@@ -57,12 +57,17 @@ func main() {
 
 	logger.Info("connected to database")
 
-	userStorage := db.NewUserStorage(dbConn, cfg.DB.RequestTimeout)
+	userStorage := user.NewUserStorage(dbConn, cfg.DB.RequestTimeout)
 	userService := user.NewService(userStorage, logger)
-
 	userHandler := user.NewHandler(logger, userService)
 	userHandler.Register(router)
 	logger.Info("initialized user routes")
+
+	authorStorage := author.NewAuthorStorage(dbConn, cfg.DB.RequestTimeout)
+	authorService := author.NewService(authorStorage, logger)
+	authorHandler := author.NewHandler(logger, authorService)
+	authorHandler.Register(router)
+	logger.Info("initialized author routes")
 
 	logger.Info("starting the server")
 	srv := server.NewServer(cfg, router, &logger)
