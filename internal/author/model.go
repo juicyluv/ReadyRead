@@ -12,7 +12,7 @@ type Author struct {
 	Surname string `json:"surname" example:"Sokolov"`
 } // @name Author
 
-// CreateAuthorDTO is used to create user.
+// CreateAuthorDTO is used to create author.
 type CreateAuthorDTO struct {
 	Name    string `json:"name" example:"Ilya"`
 	Surname string `json:"surname" example:"Sokolov"`
