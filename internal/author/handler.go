@@ -40,6 +40,17 @@ func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodDelete, authorURL, h.DeleteAuthor)
 }
 
+// GetAuthor godoc
+// @Summary Show author information
+// @Description Get author by id.
+// @Tags authors
+// @Accept json
+// @Produce json
+// @Param id path int64 true "Author id"
+// @Success 200 {object} Author
+// @Failure 404 {object} apperror.AppError
+// @Failure 500 {object} apperror.AppError
+// @Router /authors/{id} [get]
 func (h *Handler) GetAuthor(w http.ResponseWriter, r *http.Request) {
 	h.logger.Info("GET AUTHOR")
 
@@ -63,6 +74,17 @@ func (h *Handler) GetAuthor(w http.ResponseWriter, r *http.Request) {
 	response.JSON(w, http.StatusOK, author)
 }
 
+// CreateAuthor godoc
+// @Summary Create author
+// @Description Register a new author.
+// @Tags authors
+// @Accept json
+// @Produce json
+// @Param input body CreateAuthorDTO true "JSON input"
+// @Success 201 {object} Author
+// @Failure 400 {object} apperror.AppError
+// @Failure 500 {object} apperror.AppError
+// @Router /authors [post]
 func (h *Handler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
 	h.logger.Info("CREATE AUTHOR")
 
@@ -90,6 +112,19 @@ func (h *Handler) CreateAuthor(w http.ResponseWriter, r *http.Request) {
 	response.JSON(w, http.StatusCreated, author)
 }
 
+// UpdateAuthor godoc
+// @Summary Update author
+// @Description Update author with specified id.
+// @Tags authors
+// @Accept json
+// @Produce json
+// @Param id path int64 true "Author id"
+// @Param input body UpdateAuthorDTO true "JSON input"
+// @Success 200
+// @Failure 400 {object} apperror.AppError
+// @Failure 404 {object} apperror.AppError
+// @Failure 500 {object} apperror.AppError
+// @Router /authors/{id} [put]
 func (h *Handler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 	h.logger.Info("UPDATE AUTHOR")
 
@@ -128,6 +163,19 @@ func (h *Handler) UpdateAuthor(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// UpdateAuthorPartially godoc
+// @Summary Update author
+// @Description Partially update author with specified id.
+// @Tags authors
+// @Accept json
+// @Produce json
+// @Param id path int64 true "Author id"
+// @Param input body UpdateAuthorPartiallyDTO true "JSON input"
+// @Success 200
+// @Failure 400 {object} apperror.AppError
+// @Failure 404 {object} apperror.AppError
+// @Failure 500 {object} apperror.AppError
+// @Router /authors/{id} [patch]
 func (h *Handler) UpdateAuthorPartially(w http.ResponseWriter, r *http.Request) {
 	h.logger.Info("UPDATE AUTHOR PARTIALLY")
 
@@ -166,6 +214,17 @@ func (h *Handler) UpdateAuthorPartially(w http.ResponseWriter, r *http.Request) 
 	w.WriteHeader(http.StatusOK)
 }
 
+// DeleteAuthor godoc
+// @Summary Delete author
+// @Description Delete author with specified id.
+// @Tags authors
+// @Accept json
+// @Produce json
+// @Param id path int64 true "Author id"
+// @Success 200
+// @Failure 404 {object} apperror.AppError
+// @Failure 500 {object} apperror.AppError
+// @Router /authors/{id} [delete]
 func (h *Handler) DeleteAuthor(w http.ResponseWriter, r *http.Request) {
 	h.logger.Info("DELETE AUTHOR")
 
