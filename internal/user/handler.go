@@ -82,7 +82,7 @@ func (h *Handler) GetUser(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param input body CreateUserDTO true "JSON input"
-// @Success 201 {object} openapi.CreateUserResponse
+// @Success 201 {object} User
 // @Failure 400 {object} apperror.AppError
 // @Failure 500 {object} apperror.AppError
 // @Router /users [post]
