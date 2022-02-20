@@ -2,7 +2,10 @@ package user
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
+	"github.com/juicyluv/ReadyRead/internal/apperror"
 	"github.com/juicyluv/ReadyRead/pkg/logger"
 )
 
@@ -11,7 +14,8 @@ type Service interface {
 	Create(ctx context.Context, user *CreateUserDTO) (*User, error)
 	GetByEmailAndPassword(ctx context.Context, email, password string) (*User, error)
 	GetById(ctx context.Context, id int64) (*User, error)
-	UpdatePartially(ctx context.Context, user *UpdateUserDTO) error
+	Update(ctx context.Context, user *UpdateUserDTO) error
+	UpdatePartially(ctx context.Context, user *UpdateUserPartiallyDTO) error
 	Delete(ctx context.Context, id int64) error
 }
 
@@ -33,7 +37,34 @@ func NewService(storage Storage, logger logger.Logger) Service {
 // and try to insert the user. Returns inserted UUID or an error
 // on failure.
 func (s *service) Create(ctx context.Context, input *CreateUserDTO) (*User, error) {
-	return nil, nil
+	found, err := s.storage.FindByEmail(input.Email)
+	if err != nil {
+		if !errors.Is(err, apperror.ErrNoRows) {
+			return nil, err
+		}
+	}
+
+	if found != nil {
+		return nil, apperror.ErrEmailTaken
+	}
+
+	u := User{
+		Email:    input.Email,
+		Username: input.Username,
+		Password: input.Password,
+	}
+
+	err = u.HashPassword()
+	if err != nil {
+		return nil, fmt.Errorf("cannot hash password")
+	}
+
+	user, err := s.storage.Create(&u)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 // GetByEmailAndPassword will find a user with provided email.
@@ -50,12 +81,16 @@ func (s *service) GetById(ctx context.Context, id int64) (*User, error) {
 	return nil, nil
 }
 
+func (s *service) Update(ctx context.Context, user *UpdateUserDTO) error {
+	return nil
+}
+
 // UpdatePartially will find the user with provided uuid.
 // If there is no user with such id, returns No Rows error.
 // Then passwords will be compared. If it don't match, returns
 // Wrong Password error. Then updates the user. If something went wrong,
 // returns an error and nil if everything is OK.
-func (s *service) UpdatePartially(ctx context.Context, user *UpdateUserDTO) error {
+func (s *service) UpdatePartially(ctx context.Context, user *UpdateUserPartiallyDTO) error {
 	return nil
 }
 
