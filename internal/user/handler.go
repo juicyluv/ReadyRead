@@ -41,6 +41,17 @@ func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodDelete, userURL, h.DeleteUser)
 }
 
+// GetUser godoc
+// @Summary Show user information
+// @Description Get user by id.
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param id path int64 true "User id"
+// @Success 200 {object} User
+// @Failure 404 {object} apperror.AppError
+// @Failure 500 {object} apperror.AppError
+// @Router /users/{id} [get]
 func (h *Handler) GetUser(w http.ResponseWriter, r *http.Request) {
 	h.logger.Info("GET USER")
 
@@ -64,6 +75,17 @@ func (h *Handler) GetUser(w http.ResponseWriter, r *http.Request) {
 	response.JSON(w, http.StatusOK, user)
 }
 
+// CreateUser godoc
+// @Summary Create user
+// @Description Register a new user.
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param input body CreateUserDTO true "JSON input"
+// @Success 201 {object} openapi.CreateUserResponse
+// @Failure 400 {object} apperror.AppError
+// @Failure 500 {object} apperror.AppError
+// @Router /users [post]
 func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	h.logger.Info("CREATE USER")
 
@@ -96,6 +118,19 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	response.JSON(w, http.StatusCreated, user)
 }
 
+// GetUserByEmailAndPassword godoc
+// @Summary Get user by email and password from query parameters
+// @Description Get user by email and password.
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param email query string true "user email"
+// @Param password query string true "user raw password"
+// @Success 200 {object} User
+// @Failure 400 {object} apperror.AppError
+// @Failure 404 {object} apperror.AppError
+// @Failure 500 {object} apperror.AppError
+// @Router /users [get]
 func (h *Handler) GetUserByEmailAndPassword(w http.ResponseWriter, r *http.Request) {
 	h.logger.Info("GET USER BY EMAIL AND PASSWORD")
 
@@ -120,6 +155,19 @@ func (h *Handler) GetUserByEmailAndPassword(w http.ResponseWriter, r *http.Reque
 	response.JSON(w, http.StatusOK, user)
 }
 
+// UpdateUser godoc
+// @Summary Update user
+// @Description Update the user with provided current password.
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param id path int64 true "User id"
+// @Param input body UpdateUserDTO true "JSON input"
+// @Success 200
+// @Failure 400 {object} apperror.AppError
+// @Failure 404 {object} apperror.AppError
+// @Failure 500 {object} apperror.AppError
+// @Router /users/{id} [put]
 func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	h.logger.Info("UPDATE USER")
 
@@ -158,6 +206,19 @@ func (h *Handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// UpdateUserPartially godoc
+// @Summary Update user
+// @Description Partially update the user with provided current password.
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param id path int64 true "User id"
+// @Param input body UpdateUserPartiallyDTO true "JSON input"
+// @Success 200
+// @Failure 400 {object} apperror.AppError
+// @Failure 404 {object} apperror.AppError
+// @Failure 500 {object} apperror.AppError
+// @Router /users/{id} [patch]
 func (h *Handler) UpdateUserPartially(w http.ResponseWriter, r *http.Request) {
 	h.logger.Info("UPDATE USER PARTIALLY")
 
@@ -196,6 +257,17 @@ func (h *Handler) UpdateUserPartially(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// DeleteUser godoc
+// @Summary Delete user
+// @Description Delete the user by id.
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param id path int64 true "User id"
+// @Success 200
+// @Failure 404 {object} apperror.AppError
+// @Failure 500 {object} apperror.AppError
+// @Router /users/{id} [delete]
 func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	h.logger.Info("DELETE USER")
 
