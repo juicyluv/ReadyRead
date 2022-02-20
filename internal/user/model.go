@@ -40,12 +40,12 @@ func (u *User) ComparePassword(password string) bool {
 
 // CreateUserDTO is used to create user.
 type CreateUserDTO struct {
-	Email          string  `json:"email"`
-	Username       string  `json:"username"`
-	Password       string  `json:"password"`
-	Address        *string `json:"address,omitempty"`
-	PhoneNumber    *string `json:"phoneNumber,omitempty"`
-	RepeatPassword string  `json:"repeatPassword"`
+	Email          string  `json:"email" example:"admin@example.com"`
+	Username       string  `json:"username" example:"admin"`
+	Password       string  `json:"password" example:"qwERty123"`
+	RepeatPassword string  `json:"repeatPassword" example:"qwERty123"`
+	Address        *string `json:"address,omitempty" example:"Russia, Moscow, Malaya Semenovskaya, 12"`
+	PhoneNumber    *string `json:"phoneNumber,omitempty" example:"88005553535"`
 } // @name CreateUserInput
 
 // Validate will validates current struct fields.
@@ -92,11 +92,11 @@ func (u *CreateUserDTO) Validate() error {
 // UpdateUserDTO is used to update user record.
 type UpdateUserDTO struct {
 	Id          int64   `json:"-"`
-	Email       string  `json:"email"`
-	Username    string  `json:"username"`
-	Address     *string `json:"address"`
-	PhoneNumber *string `json:"phoneNumber"`
-	Password    string  `json:"oldPassword"`
+	Email       string  `json:"email" example:"admin@example.com"`
+	Username    string  `json:"username" example:"admin"`
+	Address     *string `json:"address" example:"Russia, Moscow, Malaya Semenovskaya, 12"`
+	PhoneNumber *string `json:"phoneNumber" example:"88005553535"`
+	Password    string  `json:"oldPassword" example:"qwERty123"`
 } // @name UpdateUserInput
 
 // Validate will validates current struct fields.
@@ -112,15 +112,15 @@ func (u *UpdateUserDTO) Validate() error {
 	)
 }
 
-// UpdateUserPartiallyDTO is used to update user record.
+// UpdateUserPartiallyDTO is used to partially update user record.
 type UpdateUserPartiallyDTO struct {
 	Id          int64   `json:"-"`
-	Email       *string `json:"email"`
-	Username    *string `json:"username"`
-	OldPassword *string `json:"oldPassword"`
-	NewPassword *string `json:"newPassword"`
-	Address     *string `json:"address"`
-	PhoneNumber *string `json:"phoneNumber"`
+	Email       *string `json:"email" example:"admin@example.com"`
+	Username    *string `json:"username" example:"admin"`
+	OldPassword *string `json:"oldPassword" example:"qwERty123"`
+	NewPassword *string `json:"newPassword" example:"nEwPas5worD"`
+	Address     *string `json:"address" example:"Russia, Moscow, Malaya Semenovskaya, 12"`
+	PhoneNumber *string `json:"phoneNumber" example:"88005553535"`
 } // @name UpdateUserPartiallyInput
 
 // Validate will validates current struct fields.
