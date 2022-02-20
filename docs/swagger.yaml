@@ -1,0 +1,300 @@
+basePath: /api
+definitions:
+  CreateUserInput:
+    properties:
+      address:
+        example: Russia, Moscow, Malaya Semenovskaya, 12
+        type: string
+      email:
+        example: admin@example.com
+        type: string
+      password:
+        example: qwERty123
+        type: string
+      phoneNumber:
+        example: "88005553535"
+        type: string
+      repeatPassword:
+        example: qwERty123
+        type: string
+      username:
+        example: admin
+        type: string
+    type: object
+  CreateUserResponse:
+    properties:
+      id:
+        type: string
+    type: object
+  ErrorResponse:
+    properties:
+      code:
+        type: integer
+      developerMessage:
+        type: string
+      message:
+        type: string
+    type: object
+  UpdateUserInput:
+    properties:
+      address:
+        example: Russia, Moscow, Malaya Semenovskaya, 12
+        type: string
+      email:
+        example: admin@example.com
+        type: string
+      oldPassword:
+        example: qwERty123
+        type: string
+      phoneNumber:
+        example: "88005553535"
+        type: string
+      username:
+        example: admin
+        type: string
+    type: object
+  UpdateUserPartiallyInput:
+    properties:
+      address:
+        example: Russia, Moscow, Malaya Semenovskaya, 12
+        type: string
+      email:
+        example: admin@example.com
+        type: string
+      newPassword:
+        example: nEwPas5worD
+        type: string
+      oldPassword:
+        example: qwERty123
+        type: string
+      phoneNumber:
+        example: "88005553535"
+        type: string
+      username:
+        example: admin
+        type: string
+    type: object
+  User:
+    properties:
+      address:
+        type: string
+      email:
+        example: admin@example.com
+        type: string
+      id:
+        example: 123
+        type: integer
+      phoneNumber:
+        type: string
+      registeredAt:
+        example: 2022/02/24
+        type: string
+      username:
+        example: admin
+        type: string
+      verified:
+        example: true
+        type: boolean
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API documentation for ReadyRead book shop.
+  title: ReadyRead API
+  version: 1.0.0
+paths:
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Get user by email and password.
+      parameters:
+      - description: user email
+        in: query
+        name: email
+        required: true
+        type: string
+      - description: user raw password
+        in: query
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Get user by email and password from query parameters
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Register a new user.
+      parameters:
+      - description: JSON input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/CreateUserInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/CreateUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Create user
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete the user by id.
+      parameters:
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Delete user
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      description: Get user by id.
+      parameters:
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Show user information
+      tags:
+      - users
+    patch:
+      consumes:
+      - application/json
+      description: Partially update the user with provided current password.
+      parameters:
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: JSON input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateUserPartiallyInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Update user
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update the user with provided current password.
+      parameters:
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: JSON input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/UpdateUserInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      summary: Update user
+      tags:
+      - users
+swagger: "2.0"
