@@ -14,6 +14,7 @@ type Service interface {
 	Create(ctx context.Context, user *CreateUserDTO) (*User, error)
 	GetByEmailAndPassword(ctx context.Context, email, password string) (*User, error)
 	GetById(ctx context.Context, id int64) (*User, error)
+	GetByUsername(ctx context.Context, username string) (*User, error)
 	Update(ctx context.Context, user *UpdateUserDTO) error
 	UpdatePartially(ctx context.Context, user *UpdateUserPartiallyDTO) error
 	Delete(ctx context.Context, id int64) error
@@ -32,10 +33,6 @@ func NewService(storage Storage, logger logger.Logger) Service {
 	}
 }
 
-// Create will check whether provided email already taken.
-// If it is, returns an error. Then it will hash user password
-// and try to insert the user. Returns inserted UUID or an error
-// on failure.
 func (s *service) Create(ctx context.Context, input *CreateUserDTO) (*User, error) {
 	found, err := s.storage.FindByEmail(input.Email)
 	if err != nil {
@@ -67,35 +64,110 @@ func (s *service) Create(ctx context.Context, input *CreateUserDTO) (*User, erro
 	return user, nil
 }
 
-// GetByEmailAndPassword will find a user with provided email.
-// If there's no such user with this email, returns No Rows error.
-// If password doesn't match, returns Wrong Password error.
-// Returns a user if everything is OK.
 func (s *service) GetByEmailAndPassword(ctx context.Context, email, password string) (*User, error) {
-	return nil, nil
+	user, err := s.storage.FindByEmail(email)
+	if err != nil {
+		if errors.Is(err, apperror.ErrNoRows) {
+			return nil, err
+		}
+		s.logger.Warnf("cannot find user by email: %v", err)
+		return nil, err
+	}
+
+	if !user.ComparePassword(password) {
+		return nil, apperror.ErrWrongPassword
+	}
+
+	return user, nil
 }
 
-// GetById will find a user with specified uuid in storage.
-// Returns an error on failure of there's no user with this uuid.
 func (s *service) GetById(ctx context.Context, id int64) (*User, error) {
-	return nil, nil
+	user, err := s.storage.FindById(id)
+	if err != nil {
+		if errors.Is(err, apperror.ErrNoRows) {
+			return nil, err
+		}
+		s.logger.Warnf("cannot find user by id: %v", err)
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (s *service) GetByUsername(ctx context.Context, username string) (*User, error) {
+	user, err := s.storage.FindByUsername(username)
+	if err != nil {
+		if errors.Is(err, apperror.ErrNoRows) {
+			return nil, err
+		}
+		s.logger.Warnf("cannot find user by username: %v", err)
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (s *service) Update(ctx context.Context, user *UpdateUserDTO) error {
+	u, err := s.GetById(ctx, user.Id)
+	if err != nil {
+		if !errors.Is(err, apperror.ErrNoRows) {
+			s.logger.Errorf("failed to get user: %v", err)
+		}
+		return err
+	}
+
+	if !u.ComparePassword(user.Password) {
+		return apperror.ErrWrongPassword
+	}
+
+	err = s.storage.Update(user)
+	if err != nil {
+		s.logger.Errorf("failed to update user: %v", err)
+		return err
+	}
+
 	return nil
 }
 
-// UpdatePartially will find the user with provided uuid.
-// If there is no user with such id, returns No Rows error.
-// Then passwords will be compared. If it don't match, returns
-// Wrong Password error. Then updates the user. If something went wrong,
-// returns an error and nil if everything is OK.
 func (s *service) UpdatePartially(ctx context.Context, user *UpdateUserPartiallyDTO) error {
+	u, err := s.GetById(ctx, user.Id)
+	if err != nil {
+		if !errors.Is(err, apperror.ErrNoRows) {
+			s.logger.Errorf("failed to get user: %v", err)
+		}
+		return err
+	}
+
+	if !u.ComparePassword(*user.OldPassword) {
+		return apperror.ErrWrongPassword
+	}
+
+	if user.NewPassword != nil {
+		u.Password = *user.NewPassword
+		err = user.HashPassword()
+		if err != nil {
+			s.logger.Errorf("failed ot hash password: %v", err)
+			return err
+		}
+	}
+
+	err = s.storage.UpdatePartially(user)
+	if err != nil {
+		s.logger.Errorf("failed to partially update user: %v", err)
+		return err
+	}
+
 	return nil
 }
 
-// Delete tries to delete the user with provided uuid.
-// Returns an error on failure or nil if query has been executed.
 func (s *service) Delete(ctx context.Context, id int64) error {
+	err := s.storage.Delete(id)
+	if err != nil {
+		if !errors.Is(err, apperror.ErrNoRows) {
+			s.logger.Warnf("failed to delete user: %v", err)
+		}
+		return err
+	}
+
 	return nil
 }
